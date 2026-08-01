@@ -21,3 +21,12 @@ The game deliberately avoids punishing failure — plenty of lives, slow early h
 Built entirely in vanilla HTML5 Canvas + JavaScript — a single self-contained file, no frameworks, no backend, no install. Runs instantly in any modern browser (Chrome, Firefox, Safari, Edge) and is hosted live via GitHub Pages, making it trivially shareable for judging.
 
 **Live demo**: https://shiloh297.github.io/Boomi/
+
+**Created by**
+1. Shiloh Susan Kuruvilla
+2. Aashvi Shajeep
+3. Aashvi Shajeep
+4. Aarohi Pawar
+5. Kaisha Ghai
+
+
