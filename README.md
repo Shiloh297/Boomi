@@ -25,7 +25,6 @@ Built entirely in vanilla HTML5 Canvas + JavaScript — a single self-contained 
 **Created by**
 1. Shiloh Susan Kuruvilla
 2. Aashvi Shajeep
-3. Aashvi Shajeep
 4. Aarohi Pawar
 5. Kaisha Ghai
 
