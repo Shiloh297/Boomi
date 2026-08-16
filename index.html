@@ -72,169 +72,221 @@ const PALETTE = {
 };
 
 // ---------------- STAGE DATA ----------------
-// Coordinates are in "world" space. Level width can exceed canvas width; camera scrolls.
-function mkStage(cfg){ return cfg; }
+// 20 stages. Each has a hand-written environmental theme (intro text + fact),
+// while the layout is generated from a single difficulty curve so the ramp from
+// "very easy" (stage 1) to "hard" (stage 20) is smooth and tunable in one place.
+const THEMES = [
+  {name:"Smoggy City", bg:'#9fb0b8', bgFar:'#7d919c', tokenName:"solar panels", enemies:['smog'],
+   intro:"Boomi's city is hidden under thick brown smog. Cars and chimneys pump out fumes all day long. Collect solar panels so the city can run on clean sunlight instead!",
+   fact:"Solar panels make electricity straight from sunlight without burning anything, so they give off no smoke at all."},
 
-const STAGES = [
-mkStage({
-  name:"Stage 1: Air Pollution Crisis",
-  bg:'#8fa3ad', bgFar:'#6b7f8c',
-  levelWidth: 1600,
-  intro:"Boomi's city is choking in smog! Cars and factories pump out pollution every day. Help Boomi breathe clean air by collecting solar panels to power clean energy instead!",
-  objective:"Collect 5 solar panels to reach the exit",
-  fact:"Solar power produces electricity without pollution. One solar panel can power a home for years!",
-  tokenName:"solar panels",
-  platforms:[
-    {x:0,y:GROUND_Y,w:400,h:40},
-    {x:460,y:GROUND_Y,w:220,h:40},
-    {x:560,y:GROUND_Y-100,w:140,h:20},
-    {x:740,y:GROUND_Y,w:260,h:40},
-    {x:860,y:GROUND_Y-120,w:120,h:20},
-    {x:1060,y:GROUND_Y,w:200,h:40},
-    {x:1130,y:GROUND_Y-90,w:100,h:20},
-    {x:1320,y:GROUND_Y,w:280,h:40},
-  ],
-  tokens:[
-    {x:600,y:GROUND_Y-140},
-    {x:900,y:GROUND_Y-160},
-    {x:1170,y:GROUND_Y-130},
-    {x:780,y:GROUND_Y-40},
-    {x:1400,y:GROUND_Y-40},
-    {x:1450,y:GROUND_Y-40},
-  ],
-  needed:5,
-  enemies:[
-    {type:'smog', x:500, y:GROUND_Y-60, minX:460, maxX:660, speed:0.8, dir:1},
-    {type:'exhaust', x:800, y:GROUND_Y-24, minX:760, maxX:980, speed:1.6, dir:1},
-    {type:'smog', x:1080, y:GROUND_Y-70, minX:1060, maxX:1250, speed:1.0, dir:1},
-  ],
-  goal:{x:1540,y:GROUND_Y-56},
-  start:{x:40,y:GROUND_Y-40},
-}),
-mkStage({
-  name:"Stage 2: The Wasteland",
-  bg:'#8a8362', bgFar:'#6b6248',
-  levelWidth: 1800,
-  intro:"This landfill is overflowing! Boomi must navigate through piles of trash to find recyclable materials. Recycling turns waste into new products—zero waste to the landfill!",
-  objective:"Collect 6 recyclables to reach the exit",
-  fact:"Recycling aluminum saves 95% of the energy needed to make new aluminum from raw materials.",
-  tokenName:"recyclables",
-  platforms:[
-    {x:0,y:GROUND_Y,w:300,h:40},
-    {x:360,y:GROUND_Y-40,w:140,h:20},
-    {x:540,y:GROUND_Y,w:200,h:40},
-    {x:620,y:GROUND_Y-110,w:120,h:20},
-    {x:800,y:GROUND_Y-170,w:120,h:20},
-    {x:980,y:GROUND_Y,w:220,h:40},
-    {x:1060,y:GROUND_Y-90,w:100,h:20},
-    {x:1260,y:GROUND_Y-140,w:120,h:20},
-    {x:1440,y:GROUND_Y,w:360,h:40},
-  ],
-  tokens:[
-    {x:400,y:GROUND_Y-80},
-    {x:660,y:GROUND_Y-150},
-    {x:840,y:GROUND_Y-210},
-    {x:1090,y:GROUND_Y-130},
-    {x:1300,y:GROUND_Y-180},
-    {x:1550,y:GROUND_Y-40},
-    {x:1650,y:GROUND_Y-40},
-  ],
-  needed:6,
-  enemies:[
-    {type:'trash', x:600, y:GROUND_Y-24, minX:540, maxX:730, speed:1.1, dir:1},
-    {type:'blob', x:1030, y:GROUND_Y-24, minX:1000, maxX:1120, speed:0.5, dir:1},
-    {type:'trash', x:1480, y:GROUND_Y-24, minX:1440, maxX:1700, speed:1.3, dir:1},
-  ],
-  goal:{x:1740,y:GROUND_Y-56},
-  start:{x:40,y:GROUND_Y-40},
-}),
-mkStage({
-  name:"Stage 3: Coal vs. Clean Energy",
-  bg:'#7a6a72', bgFar:'#4a3f4a',
-  levelWidth: 2000,
-  intro:"Boomi is racing against fossil fuel extraction! Coal, oil, and gas pump carbon into the air. Collect wind turbines and hydro-power tokens to show that clean energy is the future!",
-  objective:"Collect 7 clean energy tokens to reach the exit",
-  fact:"Renewable energy like wind and water will never run out—fossil fuels will, and they harm our planet.",
-  tokenName:"clean energy sources",
-  platforms:[
-    {x:0,y:GROUND_Y,w:260,h:40},
-    {x:320,y:GROUND_Y-30,w:120,h:20},
-    {x:480,y:GROUND_Y,w:180,h:40},
-    {x:560,y:GROUND_Y-120,w:100,h:20},
-    {x:740,y:GROUND_Y-180,w:120,h:20},
-    {x:920,y:GROUND_Y,w:200,h:40},
-    {x:1000,y:GROUND_Y-100,w:100,h:20},
-    {x:1180,y:GROUND_Y-160,w:120,h:20},
-    {x:1360,y:GROUND_Y,w:200,h:40},
-    {x:1440,y:GROUND_Y-110,w:100,h:20},
-    {x:1620,y:GROUND_Y-60,w:140,h:20},
-    {x:1800,y:GROUND_Y,w:200,h:40},
-  ],
-  tokens:[
-    {x:360,y:GROUND_Y-70},
-    {x:600,y:GROUND_Y-160},
-    {x:780,y:GROUND_Y-220},
-    {x:1040,y:GROUND_Y-140},
-    {x:1220,y:GROUND_Y-200},
-    {x:1480,y:GROUND_Y-150},
-    {x:1660,y:GROUND_Y-100},
-    {x:1880,y:GROUND_Y-40},
-  ],
-  needed:7,
-  enemies:[
-    {type:'miner', x:520, y:GROUND_Y-24, minX:480, maxX:650, speed:1.0, dir:1},
-    {type:'oil', x:940, y:GROUND_Y-16, minX:920, maxX:1100, speed:0.6, dir:1},
-    {type:'miner', x:1400, y:GROUND_Y-24, minX:1360, maxX:1540, speed:1.2, dir:1},
-    {type:'oil', x:1650, y:GROUND_Y-16, minX:1620, maxX:1750, speed:0.5, dir:1},
-  ],
-  goal:{x:1940,y:GROUND_Y-56},
-  start:{x:40,y:GROUND_Y-40},
-}),
-mkStage({
-  name:"Stage 4: Saving the Planet",
-  bg:'#4a5a7a', bgFar:'#2f3a52',
-  levelWidth: 2200,
-  intro:"The Earth is getting hotter! Glaciers melt, heat waves spread, and weather gets extreme. Boomi must survive and collect action tokens to show how we can fight climate change together!",
-  objective:"Collect 8 action tokens to reach the exit",
-  fact:"Global warming happens because pollution traps heat. By switching to renewable energy, recycling, and protecting forests, we can cool our planet.",
-  tokenName:"climate actions",
-  platforms:[
-    {x:0,y:GROUND_Y,w:240,h:40},
-    {x:300,y:GROUND_Y-40,w:100,h:20},
-    {x:460,y:GROUND_Y-100,w:100,h:20},
-    {x:620,y:GROUND_Y,w:160,h:40},
-    {x:700,y:GROUND_Y-150,w:100,h:20},
-    {x:860,y:GROUND_Y-200,w:100,h:20},
-    {x:1020,y:GROUND_Y,w:180,h:40},
-    {x:1100,y:GROUND_Y-110,w:100,h:20},
-    {x:1280,y:GROUND_Y-170,w:100,h:20},
-    {x:1460,y:GROUND_Y,w:180,h:40},
-    {x:1540,y:GROUND_Y-90,w:100,h:20},
-    {x:1720,y:GROUND_Y-150,w:100,h:20},
-    {x:1900,y:GROUND_Y,w:300,h:40},
-  ],
-  tokens:[
-    {x:330,y:GROUND_Y-80},
-    {x:490,y:GROUND_Y-140},
-    {x:660,y:GROUND_Y-40},
-    {x:730,y:GROUND_Y-190},
-    {x:890,y:GROUND_Y-240},
-    {x:1130,y:GROUND_Y-150},
-    {x:1310,y:GROUND_Y-210},
-    {x:1570,y:GROUND_Y-130},
-    {x:1750,y:GROUND_Y-190},
-  ],
-  needed:8,
-  enemies:[
-    {type:'heat', x:650, y:GROUND_Y-24, minX:620, maxX:780, speed:0, dir:1, pulse:0},
-    {type:'ice', x:1050, y:GROUND_Y-200, minX:1020, maxX:1200, speed:1.0, dir:1, fallTimer:0},
-    {type:'heat', x:1490, y:GROUND_Y-24, minX:1460, maxX:1640, speed:0, dir:1, pulse:0},
-    {type:'ice', x:1750, y:GROUND_Y-200, minX:1720, maxX:1900, speed:1.1, dir:1, fallTimer:0},
-  ],
-  goal:{x:2140,y:GROUND_Y-56},
-  start:{x:40,y:GROUND_Y-40},
-}),
+  {name:"Rush Hour", bg:'#a3a9a6', bgFar:'#7f8a8c', tokenName:"clean ride passes", enemies:['exhaust','smog'],
+   intro:"Every road is jammed and each car is puffing out exhaust. Buses, bikes and trains carry far more people using much less fuel. Collect clean ride passes to clear the air!",
+   fact:"One full bus can take about 40 cars off the road, which cuts both fuel use and air pollution."},
+
+  {name:"Factory Row", bg:'#9aa39b', bgFar:'#76817c', tokenName:"smoke filters", enemies:['smog','exhaust'],
+   intro:"These old factories send smoke straight up into the sky. Modern filters and cleaner power can stop most of that pollution. Collect smoke filters to clean up Factory Row!",
+   fact:"Filters fitted to chimneys can trap most of the harmful soot and particles before they ever reach the air we breathe."},
+
+  {name:"The Landfill", bg:'#8a8362', bgFar:'#6b6248', tokenName:"recyclables", enemies:['trash'],
+   intro:"The landfill is overflowing with things that were thrown away too soon. Most of it could have been reused or recycled. Help Boomi rescue the recyclables from the rubbish!",
+   fact:"Recycling aluminium saves about 95% of the energy needed to make new aluminium from raw rock."},
+
+  {name:"Recycling Run", bg:'#8f8a6a', bgFar:'#6e6a4e', tokenName:"sorting bins", enemies:['trash','blob'],
+   intro:"Recycling only works when waste is sorted properly. Paper, glass, metal and plastic each take a different path to becoming something new. Collect the sorting bins!",
+   fact:"Sorting waste correctly matters: one dirty item can spoil a whole batch and send it to landfill instead."},
+
+  {name:"Toxic Ooze", bg:'#7f8a63', bgFar:'#5f6a49', tokenName:"safe disposal kits", enemies:['blob','trash'],
+   intro:"Old batteries, paint and electronics leak poisons into the soil and water. They need special disposal, never the normal bin. Collect safe disposal kits to lock the toxins away!",
+   fact:"A single old battery can contaminate a large amount of soil, which is why they must go to special collection points."},
+
+  {name:"Plastic Tide", bg:'#6f97a6', bgFar:'#4e7280', tokenName:"plastic bottles", enemies:['blob'],
+   intro:"Plastic washed into the sea harms turtles, fish and birds that mistake it for food. Every bottle picked up is one less danger. Collect the plastic before the tide takes it!",
+   fact:"Plastic does not rot away. It only breaks into smaller pieces that stay in the ocean for hundreds of years."},
+
+  {name:"Coal Country", bg:'#7a6a72', bgFar:'#4a3f4a', tokenName:"wind turbines", enemies:['miner'],
+   intro:"Coal is dug from the ground and burned for power, releasing carbon into the air. The wind above this valley could do the same job cleanly. Collect wind turbines!",
+   fact:"Burning coal is one of the largest sources of the carbon dioxide that is warming our planet."},
+
+  {name:"Oil Fields", bg:'#6d6258', bgFar:'#48403a', tokenName:"clean fuel tokens", enemies:['oil','miner'],
+   intro:"Oil pumps work day and night, and spills stain the ground around them. Cleaner fuels and electric power can replace them. Collect clean fuel tokens to shut the pumps down!",
+   fact:"Oil spills can harm land and water for years, poisoning plants and the animals that depend on them."},
+
+  {name:"Gas Flares", bg:'#7d6a5c', bgFar:'#54463c', tokenName:"leak sealers", enemies:['oil','exhaust'],
+   intro:"Natural gas escaping from pipes is invisible but very damaging. Sealing leaks is one of the quickest wins for the climate. Collect leak sealers to stop the waste!",
+   fact:"Methane, the main gas in natural gas, traps far more heat than carbon dioxide over its first twenty years in the air."},
+
+  {name:"Wind Ridge", bg:'#8fa6b8', bgFar:'#66808f', tokenName:"wind turbines", enemies:['miner','oil'],
+   intro:"High on this windy ridge the air never stops moving. Turbines here can power thousands of homes without any fuel. Collect turbines and let the wind do the work!",
+   fact:"Wind turbines create electricity with no fuel and no waste, and the wind will never run out."},
+
+  {name:"Sunlight Valley", bg:'#b8a878', bgFar:'#8f8256', tokenName:"solar arrays", enemies:['smog','miner'],
+   intro:"This valley gets sunshine almost every day of the year. Rows of solar panels here could power a whole city. Collect solar arrays and switch the valley to sunlight!",
+   fact:"The sunlight reaching Earth in a single hour carries more energy than the whole world uses in a year."},
+
+  {name:"River Power", bg:'#6f93a6', bgFar:'#4b6b7d', tokenName:"hydro tokens", enemies:['oil','blob'],
+   intro:"Flowing water is heavy and strong, and it can spin turbines all day long. Hydro power has run on rivers for over a century. Collect hydro tokens to light up the valley!",
+   fact:"Hydropower uses the natural water cycle, so the same water is lifted by the sun and used again and again."},
+
+  {name:"Forest Fall", bg:'#7d7a58', bgFar:'#585840', tokenName:"saplings", enemies:['trash','miner'],
+   intro:"Trees here are being cleared faster than they can grow back. Forests store carbon and shelter countless animals. Collect saplings so the forest can return!",
+   fact:"Forests absorb carbon dioxide as they grow, which makes them one of nature's best defences against warming."},
+
+  {name:"New Growth", bg:'#6f8a5c', bgFar:'#4d6440', tokenName:"young trees", enemies:['trash','blob'],
+   intro:"New trees are pushing up through the cleared ground. With care they will become a forest again within Boomi's lifetime. Collect young trees and help the woodland recover!",
+   fact:"A single mature tree can absorb a meaningful amount of carbon dioxide every year, plus give shade and homes to wildlife."},
+
+  {name:"Water Watch", bg:'#6b93a0', bgFar:'#496b78', tokenName:"water drops", enemies:['blob','oil'],
+   intro:"Clean fresh water is far rarer than it looks, and a dripping tap wastes it a drop at a time. Every drop saved matters. Collect water drops to protect the supply!",
+   fact:"Less than 1% of the water on Earth is fresh water that people can actually drink and use."},
+
+  {name:"Power Saver", bg:'#7a86a0', bgFar:'#555f78', tokenName:"LED bulbs", enemies:['exhaust','smog'],
+   intro:"Lights left on and old bulbs quietly waste electricity all over town. The cleanest energy of all is the energy we never use. Collect LED bulbs to cut the waste!",
+   fact:"LED bulbs use roughly 80% less electricity than old filament bulbs and last many times longer."},
+
+  {name:"Electric Streets", bg:'#6f7f96', bgFar:'#4a586e', tokenName:"charging points", enemies:['exhaust','oil'],
+   intro:"Electric vehicles make no exhaust fumes at all, and they get cleaner as the power grid gets greener. Collect charging points to electrify these streets!",
+   fact:"Electric vehicles produce no exhaust pipe pollution, which makes the air along busy streets much healthier."},
+
+  {name:"Melting Ice", bg:'#8fb4c9', bgFar:'#5f8299', tokenName:"ice cores", enemies:['ice','heat'],
+   intro:"The glaciers are thinning and great slabs of ice are breaking away. Scientists read ancient air trapped inside the ice to understand our climate. Collect ice cores before they melt!",
+   fact:"Bubbles trapped in deep ice hold air from thousands of years ago, showing how much the atmosphere has changed."},
+
+  {name:"The Last Heat Wave", bg:'#4a5a7a', bgFar:'#2f3a52', tokenName:"climate actions", enemies:['heat','ice'],
+   intro:"This is Boomi's toughest challenge: rising heat, falling ice and extreme weather all at once. Everything she has learned comes together here. Collect climate actions and cool the planet!",
+   fact:"Global warming happens because pollution traps heat. Clean energy, recycling and protecting forests together can cool our planet."},
 ];
+
+const STAGE_COUNT = THEMES.length;
+
+// Deterministic PRNG so every player gets exactly the same 20 levels.
+function mulberry32(a){
+  return function(){
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+const ENEMY_BASE_SPEED = {smog:1.0, exhaust:1.25, trash:1.1, blob:0.6, miner:1.1, oil:0.6, heat:0, ice:1.0};
+
+// `pad` keeps a hazard away from the platform edges so there is always a safe
+// spot to land after a jump — otherwise a patrol can sit on the landing zone
+// and hit the player before they can react.
+function makeEnemy(type, plat, rnd, speedMul, pad){
+  const minX = plat.x + pad, maxX = plat.x + plat.w - pad;
+  if(maxX - minX < 24) return null;
+  const e = {
+    type,
+    x: minX + rnd()*(maxX - minX),
+    minX, maxX,
+    speed: (ENEMY_BASE_SPEED[type] || 1) * speedMul,
+    dir: rnd() < 0.5 ? -1 : 1,
+  };
+  // Smog drifts well above head height: you walk under it comfortably, but it
+  // still punishes jumping in the wrong place.
+  if(type === 'smog') e.y = plat.y - 88 - Math.round(rnd()*28);
+  else if(type === 'ice'){ e.y = plat.y - 200; e.fallTimer = Math.floor(rnd()*140); }
+  else if(type === 'heat'){ e.y = plat.y - 24; e.pulse = rnd()*Math.PI*2; }
+  else if(type === 'oil') e.y = plat.y - 16;
+  else e.y = plat.y - 24;
+  return e;
+}
+
+// Replays Boomi's jump physics to find where her arc crosses a given x, so a
+// pickup can be placed exactly where a normal running jump will carry her.
+function arcOverGap(jumpStartX, targetX){
+  let x = jumpStartX, y = GROUND_Y - 30, vy = JUMP_V;
+  for(let f = 0; f < 240; f++){
+    x += MOVE_SPEED;
+    vy += GRAVITY;
+    y += vy;
+    if(x >= targetX) break;
+  }
+  return {x, y: y + 15}; // centre of the sprite at that moment
+}
+
+// Boomi's jump clears roughly 230px horizontally and 183px vertically, so gaps
+// stay well under 120px and raised platforms stay under ~145px above ground.
+function genStage(i){
+  const th = THEMES[i];
+  const t = STAGE_COUNT > 1 ? i/(STAGE_COUNT-1) : 0;
+  const rnd = mulberry32(1000 + i*7919);
+  const L = (a,b) => a + (b-a)*t;
+
+  const platforms = [], tokens = [], enemies = [], ground = [];
+  const segs = Math.round(L(4, 11));
+
+  const first = {x:0, y:GROUND_Y, w:Math.round(L(380,240)), h:40};
+  platforms.push(first); ground.push(first);
+  let x = first.w, firstGap = null;
+
+  for(let s = 0; s < segs; s++){
+    const gap = Math.round(L(58,72) + rnd()*L(18,46));
+    // The jetpack hovers on the actual jump arc over the first ditch, so leaping
+    // the gap sweeps Boomi through it. Sitting at the bare gap midpoint put it
+    // near the apex of the arc, where she sailed straight over the top of it.
+    if(firstGap === null) firstGap = arcOverGap(x - 45, x + gap/2);
+    x += gap;
+    const pw = Math.round(L(300,180) + rnd()*L(60,55));
+    const p = {x, y:GROUND_Y, w:pw, h:40};
+    platforms.push(p); ground.push(p);
+    // A raised platform must leave clear ground on BOTH sides: stepping off its
+    // right edge has to land you back on this platform, never out over the pit.
+    const ew = Math.round(L(140,95));
+    const RUNOFF = 110;
+    if(rnd() < L(0.35,0.85) && pw > ew + RUNOFF + 30){
+      const eh = Math.round(L(80,105) + rnd()*38);
+      const ex = x + 20 + Math.round(rnd()*Math.max(0, pw - ew - RUNOFF - 20));
+      platforms.push({x:ex, y:GROUND_Y-eh, w:ew, h:20});
+      tokens.push({x:ex + ew/2, y:GROUND_Y - eh - 38});
+    } else {
+      tokens.push({x:x + pw/2, y:GROUND_Y - 40});
+    }
+    x += pw;
+  }
+
+  const last = ground[ground.length-1];
+  tokens.push({x:last.x + 40, y:GROUND_Y - 40});
+
+  // At most ONE hazard per platform (stacked patrols were unfair and looked like
+  // a glitch), never on the opening platform or the final run to the exit, and
+  // always inset from the edges so every jump has a safe landing spot.
+  const count = Math.round(L(1, 6));
+  const speedMul = L(0.25, 0.85);
+  const PAD = 58;
+  const eligible = ground.slice(1, Math.max(2, ground.length - 1))
+                         .filter(p => p.w > PAD*2 + 30);
+  for(let k = eligible.length - 1; k > 0; k--){        // deterministic shuffle
+    const j = Math.floor(rnd()*(k+1));
+    const tmp = eligible[k]; eligible[k] = eligible[j]; eligible[j] = tmp;
+  }
+  let iceUsed = 0;
+  for(let n = 0; n < count && n < eligible.length; n++){
+    let type = th.enemies[Math.floor(rnd()*th.enemies.length)];
+    // falling ice denies a whole column, so keep it rare
+    if(type === 'ice' && iceUsed >= 2) type = th.enemies.find(x => x !== 'ice') || 'heat';
+    if(type === 'ice') iceUsed++;
+    const e = makeEnemy(type, eligible[n], rnd, speedMul, PAD);
+    if(e) enemies.push(e);
+  }
+
+  return {
+    name: `Stage ${i+1}: ${th.name}`,
+    bg: th.bg, bgFar: th.bgFar,
+    levelWidth: last.x + last.w,
+    intro: th.intro,
+    fact: th.fact,
+    tokenName: th.tokenName,
+    platforms, tokens, enemies,
+    goal:  {x:last.x + last.w - 56, y:GROUND_Y - 56},
+    start: {x:40, y:GROUND_Y - 40},
+    jetpack: {x:firstGap.x, y:firstGap.y},
+  };
+}
+
+const STAGES = THEMES.map((_, i) => genStage(i));
 
 // ---------------- GAME STATE ----------------
 let state = 'START'; // START, STAGE_INTRO, PLAYING, STAGE_COMPLETE, GAME_OVER, WIN
@@ -249,6 +301,8 @@ let flashTimer = 0;
 let sparkles = [];
 let stageNeeded = 0;
 let checkpoint = null;
+let jetpack = null;
+let jetpackMsgTimer = 0;
 
 let player, curStage, tokenList, enemyList;
 
@@ -261,22 +315,24 @@ function startGame(){
   introTimer = 0;
 }
 
-// Progressive difficulty: stage 1 is very gentle, each later stage ramps up gradually.
-const DIFFICULTY_MUL = [0.3, 0.4, 0.55, 0.7];
+// Difficulty now rides on the stage generator's curve (see genStage), so enemy
+// speeds are already baked into each stage's data.
 // Fraction of placed tokens actually required to unlock the exit (forgiving for young players).
 const NEEDED_FRACTION = 0.55;
 
 function loadStage(i){
   curStage = STAGES[i];
-  const mul = DIFFICULTY_MUL[i] !== undefined ? DIFFICULTY_MUL[i] : 1;
   tokenList = curStage.tokens.map(t=>({x:t.x,y:t.y,collected:false,bob:Math.random()*Math.PI*2}));
-  enemyList = curStage.enemies.map(e=>({...e, speed: e.speed*mul}));
+  enemyList = curStage.enemies.map(e=>({...e}));
   tokensCollected = 0;
   stageNeeded = Math.max(2, Math.round(curStage.tokens.length * NEEDED_FRACTION));
+  jetpack = curStage.jetpack ? {x:curStage.jetpack.x, y:curStage.jetpack.y, collected:false, bob:0} : null;
+  jetpackMsgTimer = 0;
   player = {
     x: curStage.start.x, y: curStage.start.y,
     w: 22, h: 30,
     vx:0, vy:0, onGround:false, facing:1,
+    flying:false, flyTimer:0,
   };
   checkpoint = {x: curStage.start.x, y: curStage.start.y};
   camX = 0;
@@ -307,6 +363,10 @@ function nextStageOrWin(){
 
 function loseLife(){
   lives--;
+  // Always end flight on death — respawning while still flying would let the
+  // player sink straight back through the ground and lose every life at once.
+  player.flying = false;
+  player.flyTimer = 0;
   if(lives <= 0){
     state = 'GAME_OVER';
   } else {
@@ -328,35 +388,56 @@ function updatePlaying(){
   if(keys['ArrowLeft']){ player.vx = -MOVE_SPEED; player.facing = -1; }
   if(keys['ArrowRight']){ player.vx = MOVE_SPEED; player.facing = 1; }
 
-  if((keys[' '] || keys['ArrowUp']) && player.onGround){ player.vy = JUMP_V; player.onGround = false; }
-  player.vy += GRAVITY;
-  if(player.vy > 14) player.vy = 14;
+  if(player.flying){
+    if(keys[' '] || keys['ArrowUp']) player.vy = -4.2;
+    else if(keys['ArrowDown']) player.vy = 3.2;
+    else player.vy += 0.15;
+    if(player.vy > 3) player.vy = 3;
+    if(player.vy < -4.2) player.vy = -4.2;
+  } else {
+    if((keys[' '] || keys['ArrowUp']) && player.onGround){ player.vy = JUMP_V; player.onGround = false; }
+    player.vy += GRAVITY;
+    if(player.vy > 14) player.vy = 14;
+  }
 
-  // horizontal move + collide
+  // horizontal move + collide (jetpack flight passes straight through platforms,
+  // which also avoids the corner-collision "stuck" issue while flying)
   player.x += player.vx;
-  for(const p of curStage.platforms){
-    if(rectsOverlap(player,p)){
-      if(player.vx > 0) player.x = p.x - player.w;
-      else if(player.vx < 0) player.x = p.x + p.w;
+  if(!player.flying){
+    for(const p of curStage.platforms){
+      if(rectsOverlap(player,p)){
+        if(player.vx > 0) player.x = p.x - player.w;
+        else if(player.vx < 0) player.x = p.x + p.w;
+      }
     }
   }
   if(player.x < 0) player.x = 0;
   if(player.x + player.w > curStage.levelWidth) player.x = curStage.levelWidth - player.w;
 
-  // vertical move + collide
+  // vertical move + collide (jetpack flight passes straight through platforms)
   player.y += player.vy;
   player.onGround = false;
-  for(const p of curStage.platforms){
-    if(rectsOverlap(player,p)){
-      if(player.vy > 0){
-        player.y = p.y - player.h;
-        player.vy = 0;
-        player.onGround = true;
-      } else if(player.vy < 0){
-        player.y = p.y + p.h;
-        player.vy = 0;
+  if(!player.flying){
+    for(const p of curStage.platforms){
+      if(rectsOverlap(player,p)){
+        if(player.vy > 0){
+          player.y = p.y - player.h;
+          player.vy = 0;
+          player.onGround = true;
+        } else if(player.vy < 0){
+          player.y = p.y + p.h;
+          player.vy = 0;
+        }
       }
     }
+  }
+  // While the jetpack is active the player passes through platforms, so keep
+  // them inside the play area: they must not sink below ground level and drop
+  // out of the world (that used to cost every life in a couple of seconds).
+  if(player.flying){
+    if(player.y < 20) player.y = 20;
+    const floor = GROUND_Y - player.h;
+    if(player.y > floor){ player.y = floor; if(player.vy > 0) player.vy = 0; }
   }
 
   // update checkpoint whenever safely standing on a platform, well clear of any enemy,
@@ -400,7 +481,7 @@ function updatePlaying(){
       t.collected = true;
       tokensCollected++;
       totalTokensAllTime++;
-      sparkles.push({x:t.x,y:t.y,life:20});
+      sparkles.push({x:t.x,y:t.y,life:20,max:20});
     }
   }
 
@@ -438,14 +519,53 @@ function updatePlaying(){
     } else {
       ebox = {x:e.x-9,y:e.y-5,w:18,h:22};
     }
-    if(invuln <= 0 && rectsOverlap(player, ebox)){
+    if(invuln <= 0 && !player.flying && rectsOverlap(player, ebox)){
       loseLife();
       return;
     }
   }
 
+  // jetpack pickup (placed above a ditch — must be jumped for; flying through it is free)
+  if(jetpack && !jetpack.collected){
+    jetpack.bob = (jetpack.bob||0) + 0.07;
+    // generous grab box so slightly early/late jumps still connect
+    const jb = {x:jetpack.x-22,y:jetpack.y-26+Math.sin(jetpack.bob)*4,w:44,h:52};
+    if(rectsOverlap(player, jb)){
+      jetpack.collected = true;
+      player.flying = true;
+      player.flyTimer = 300; // 5 seconds at 60fps
+      jetpackMsgTimer = 180;
+      sparkles.push({x:jetpack.x,y:jetpack.y,life:24,max:24});
+    }
+  }
+
+  if(player.flying){
+    player.flyTimer--;
+    if(player.flyTimer <= 0){
+      player.flying = false;
+      // Flight let the player drift through platforms; if landing ends inside
+      // one, force a clean placement on top of it so collision can't wedge
+      // them into the geometry (the same "corner stuck" failure mode as
+      // before, just triggered at touchdown instead of mid-flight).
+      for(const p of curStage.platforms){
+        if(rectsOverlap(player,p)){
+          player.y = p.y - player.h;
+          player.vy = 0;
+          player.onGround = true;
+          break;
+        }
+      }
+      // Brief shield on touchdown: the jetpack can drop you right next to a
+      // hazard, and landing straight into an unavoidable hit is not fair.
+      invuln = Math.max(invuln, 70);
+    }
+  }
+  if(jetpackMsgTimer > 0) jetpackMsgTimer--;
+
   // goal
-  const g = {x:curStage.goal.x-16,y:curStage.goal.y-48,w:32,h:48};
+  // Hitbox runs from the flag all the way down to the ground so simply walking
+  // into the exit finishes the stage (it used to float above head height).
+  const g = {x:curStage.goal.x-18,y:curStage.goal.y-48,w:44,h:(GROUND_Y-(curStage.goal.y-48))};
   if(tokensCollected >= stageNeeded && rectsOverlap(player,g)){
     state = 'STAGE_COMPLETE';
   }
@@ -490,8 +610,17 @@ function drawPlatform(p){
 
 function drawPlayer(){
   const x = player.x - camX, y = player.y;
-  if(invuln>0 && Math.floor(invuln/4)%2===0) return;
+  if(invuln>0 && !player.flying && Math.floor(invuln/4)%2===0) return;
   ctx.save();
+  if(player.flying){
+    ctx.fillStyle = '#3a6ea5';
+    ctx.fillRect(x-6,y+8,7,16);
+    ctx.fillStyle = 'rgba(255,150,60,0.9)';
+    const flick = Math.random()*4;
+    ctx.beginPath();
+    ctx.moveTo(x-6,y+24); ctx.lineTo(x-2,y+30+flick); ctx.lineTo(x+1,y+24);
+    ctx.fill();
+  }
   // legs
   ctx.fillStyle = PALETTE.boomiPants;
   ctx.fillRect(x+4,y+20,6,10);
@@ -599,7 +728,7 @@ function drawEnemy(e){
 function drawGoal(){
   const x = curStage.goal.x - camX, y = curStage.goal.y;
   ctx.fillStyle = '#8b5a2b';
-  ctx.fillRect(x-2,y-48,4,48);
+  ctx.fillRect(x-2,y-48,4,GROUND_Y-(y-48)); // pole runs down to the ground
   const ready = tokensCollected >= stageNeeded;
   ctx.fillStyle = ready ? '#4be04b' : '#999';
   ctx.fillRect(x,y-48,26,18);
@@ -608,11 +737,42 @@ function drawGoal(){
   ctx.fillText(ready?'GO!':'LOCK', x+2, y-36);
 }
 
+function drawJetpack(){
+  if(!jetpack || jetpack.collected) return;
+  const x = jetpack.x - camX, y = jetpack.y + Math.sin(jetpack.bob||0)*4;
+  if(x < -24 || x > W+24) return;
+  ctx.save();
+  ctx.translate(x,y);
+  const glow = ctx.createRadialGradient(0,0,2,0,0,20);
+  glow.addColorStop(0, '#d0f0ff');
+  glow.addColorStop(1, 'rgba(208,240,255,0)');
+  ctx.fillStyle = glow;
+  ctx.beginPath(); ctx.arc(0,0,20,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#3a6ea5';
+  ctx.fillRect(-8,-12,16,20);
+  ctx.fillStyle = '#5fb8e0';
+  ctx.fillRect(-6,-10,5,16);
+  ctx.fillRect(1,-10,5,16);
+  ctx.fillStyle = '#ffcc00';
+  ctx.fillRect(-3,-16,6,6);
+  ctx.fillStyle = 'rgba(255,150,60,0.85)';
+  ctx.beginPath();
+  ctx.moveTo(-6,8); ctx.lineTo(-3,18); ctx.lineTo(0,8);
+  ctx.moveTo(0,8); ctx.lineTo(3,18); ctx.lineTo(6,8);
+  ctx.fill();
+  ctx.restore();
+}
+
 function drawSparkles(){
   for(const s of sparkles){
     const x = s.x-camX, y=s.y;
-    ctx.fillStyle = `rgba(255,255,180,${s.life/20})`;
-    ctx.beginPath(); ctx.arc(x,y,20-s.life,0,Math.PI*2); ctx.fill();
+    // Radius must never go negative: canvas arc() throws IndexSizeError on a
+    // negative radius, which would kill the render loop and freeze the game.
+    const max = s.max || 20;
+    const r = Math.max(0, max - s.life);
+    const alpha = Math.max(0, Math.min(1, s.life/max));
+    ctx.fillStyle = `rgba(255,255,180,${alpha})`;
+    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
   }
 }
 
@@ -632,6 +792,36 @@ function drawHUD(){
   ctx.font='13px monospace';
   ctx.fillText(curStage.name, W-16, 22);
   ctx.textAlign='left';
+
+  if(player.flying){
+    const pct = player.flyTimer/300;
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.fillRect(W/2-80, 34, 160, 10);
+    ctx.fillStyle = '#5fb8e0';
+    ctx.fillRect(W/2-80, 34, 160*pct, 10);
+    ctx.strokeStyle='#fff'; ctx.strokeRect(W/2-80,34,160,10);
+    ctx.fillStyle='#fff';
+    ctx.font='11px monospace';
+    ctx.textAlign='center';
+    ctx.fillText('JETPACK', W/2, 32);
+    ctx.textAlign='left';
+  }
+
+  if(jetpackMsgTimer > 0){
+    ctx.save();
+    ctx.globalAlpha = Math.min(1, jetpackMsgTimer/40);
+    ctx.fillStyle = 'rgba(20,40,60,0.8)';
+    ctx.fillRect(W/2-230, 48, 460, 48);
+    ctx.textAlign='center';
+    ctx.fillStyle = '#ffe680';
+    ctx.font='16px monospace';
+    ctx.fillText('Jetpack power lasts for 5 seconds.', W/2, 68);
+    ctx.fillStyle = '#aef0ff';
+    ctx.font='12px monospace';
+    ctx.fillText('Hydrogen-powered - clean flight, zero emissions!', W/2, 87);
+    ctx.textAlign='left';
+    ctx.restore();
+  }
 }
 
 function drawHeart(cx,cy,s){
@@ -669,7 +859,7 @@ function drawStartScreen(){
   ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
   textBlock(["BOOMI'S EARTH ADVENTURE"], W/2, 160, 30, '#fff', 'center');
   textBlock(["Help save the planet!"], W/2, 210, 18, '#dfffe0', 'center');
-  textBlock(wrapText("Collect clean energy tokens and avoid pollution hazards across 4 stages.",44), W/2, 250, 14, '#eaffea', 'center');
+  textBlock(wrapText("Collect clean energy tokens and avoid pollution hazards across 20 stages.",44), W/2, 250, 14, '#eaffea', 'center');
   ctx.fillStyle = '#ffcc00';
   ctx.fillRect(W/2-90, 320, 180, 50);
   ctx.fillStyle = '#222';
@@ -686,6 +876,7 @@ function drawStageIntro(){
   const lines = wrapText(curStage.intro, 46);
   textBlock(lines, W/2, 160, 15, '#fff', 'center');
   textBlock([`Collect ${stageNeeded} ${curStage.tokenName} to reach the exit`], W/2, 160+lines.length*23+30, 15, '#ffe680', 'center');
+  textBlock(["A jetpack is hidden above one ditch — grab it for 5s of flight, or skip it and jump!"], W/2, 160+lines.length*23+55, 12, '#aef0ff', 'center');
   if(Math.floor(introTimer/30)%2===0){
     textBlock(["Press an ARROW KEY or SPACE to begin!"], W/2, 420, 14, '#cde8ff', 'center');
   }
@@ -742,6 +933,7 @@ function draw(){
   drawBackground();
   curStage.platforms.forEach(drawPlatform);
   tokenList.forEach(drawToken);
+  drawJetpack();
   enemyList.forEach(drawEnemy);
   drawGoal();
   drawPlayer();
